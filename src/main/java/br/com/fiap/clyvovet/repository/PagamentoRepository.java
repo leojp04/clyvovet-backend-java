@@ -1,0 +1,8 @@
+package br.com.fiap.clyvovet.repository;
+
+import br.com.fiap.clyvovet.model.Pagamento;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.UUID;
+
+public interface PagamentoRepository extends JpaRepository<Pagamento, UUID> {
+}
