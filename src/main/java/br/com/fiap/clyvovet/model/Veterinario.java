@@ -22,6 +22,7 @@ public class Veterinario {
     private String cpf;
     private String nome;
     private LocalDate dataNascimento;
+    @Enumerated(EnumType.STRING)
     private Sexo sexo;
     private String email;
     private String telefone;

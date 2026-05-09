@@ -15,12 +15,14 @@ import java.util.UUID;
 @Setter          // gera todos os setters
 @NoArgsConstructor   // gera construtor vazio
 @AllArgsConstructor  // gera construtor com todos os campos
+
 @Entity
 public class Pagamento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    @Enumerated(EnumType.STRING)
     private FormaPagamento formaPagamento;
     private BigDecimal valor;
     private LocalDate dataPagamento;
@@ -29,5 +31,6 @@ public class Pagamento {
     @ManyToOne
     @JoinColumn(name = "evento_clinico_id")
     private EventoClinico eventoClinico;
+    @Enumerated(EnumType.STRING)
     private StatusPagamento statusPagamento;
 }

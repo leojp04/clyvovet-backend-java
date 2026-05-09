@@ -32,5 +32,6 @@ public class EventoClinico {
     @ManyToOne
     @JoinColumn(name = "clinica_id")
     private Clinica clinica;
+    @Enumerated(EnumType.STRING)
     private TipoEvento tipoEvento;
 }
