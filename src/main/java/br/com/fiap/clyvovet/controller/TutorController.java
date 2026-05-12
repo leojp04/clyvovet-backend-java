@@ -3,6 +3,7 @@ package br.com.fiap.clyvovet.controller;
 import br.com.fiap.clyvovet.dto.tutor.TutorRequest;
 import br.com.fiap.clyvovet.dto.tutor.TutorResponse;
 import br.com.fiap.clyvovet.service.TutorService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,12 +29,12 @@ public class TutorController {
     }
 
     @PostMapping
-    public ResponseEntity<TutorResponse> criar(@RequestBody TutorRequest tutorRequest) {
+    public ResponseEntity<TutorResponse> criar(@Valid @RequestBody TutorRequest tutorRequest) {
         return ResponseEntity.status(201).body(tutorService.salvar(tutorRequest));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TutorResponse> atualizar(@PathVariable UUID id, @RequestBody TutorRequest tutorRequest) {
+    public ResponseEntity<TutorResponse> atualizar(@PathVariable UUID id, @Valid @RequestBody TutorRequest tutorRequest) {
         return ResponseEntity.ok(tutorService.atualizar(id, tutorRequest));
     }
 

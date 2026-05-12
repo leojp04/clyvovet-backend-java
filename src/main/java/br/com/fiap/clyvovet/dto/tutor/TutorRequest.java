@@ -2,6 +2,7 @@ package br.com.fiap.clyvovet.dto.tutor;
 
 import br.com.fiap.clyvovet.dto.endereco.EnderecoRequest;
 import br.com.fiap.clyvovet.model.Sexo;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,11 +14,22 @@ import java.time.LocalDate;
 @Getter
 public class TutorRequest {
 
+    @NotBlank
+    @Size(min = 3, max = 100)
     private String nome;
+    @NotBlank
+    @Size(min = 11, max = 11)
     private String cpf;
+    @NotBlank
+    @Email
     private String email;
+    @NotBlank
+    @Size(min = 10, max = 11)
     private String telefone;
+    @NotNull
     private Sexo sexo;
+    @NotNull
     private LocalDate dataNascimento;
+    @NotNull
     private EnderecoRequest endereco;
 }
