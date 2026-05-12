@@ -1,5 +1,8 @@
 package br.com.fiap.clyvovet.service;
 
+import br.com.fiap.clyvovet.dto.clinica.ClinicaRequest;
+import br.com.fiap.clyvovet.dto.clinica.ClinicaResponse;
+import br.com.fiap.clyvovet.mapper.ClinicaMapper;
 import br.com.fiap.clyvovet.model.Clinica;
 import br.com.fiap.clyvovet.repository.ClinicaRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,18 +16,27 @@ import java.util.UUID;
 public class ClinicaService {
 
     private final ClinicaRepository clinicaRepository;
+    private final ClinicaMapper clinicaMapper;
 
-    public List<Clinica> listarTodos() {
-        return clinicaRepository.findAll();
+    public List<ClinicaResponse> listarTodos() {
+        return clinicaRepository.findAll().stream().map(clinicaMapper::clinicaToResponse).toList();
     }
 
-    public Clinica buscarPorId(UUID id) {
-        return clinicaRepository.findById(id)
+    public ClinicaResponse buscarPorId(UUID id) {
+        return clinicaRepository.findById(id).map(clinicaMapper::clinicaToResponse).orElseThrow(() -> new RuntimeException("Clínica não encontrada"));
+    }
+
+    public ClinicaResponse salvar(ClinicaRequest clinicaRequest) {
+        Clinica clinica = clinicaMapper.toEntity(clinicaRequest);
+        return clinicaMapper.clinicaToResponse(clinicaRepository.save(clinica));
+    }
+
+    public ClinicaResponse atualizar(UUID id, ClinicaRequest clinicaRequest) {
+        Clinica clinica = clinicaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Clínica não encontrada"));
-    }
-
-    public Clinica salvar(Clinica clinica) {
-        return clinicaRepository.save(clinica);
+        clinicaMapper.atualizar(clinica, clinicaRequest);
+        clinicaRepository.save(clinica);
+        return clinicaMapper.clinicaToResponse(clinica);
     }
 
     public void deletar(UUID id) {
