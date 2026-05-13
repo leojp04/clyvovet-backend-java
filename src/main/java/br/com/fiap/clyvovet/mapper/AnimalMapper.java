@@ -7,14 +7,32 @@ import br.com.fiap.clyvovet.model.Tutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class AnimalMapper {
+
     public AnimalResponse animalToResponse(Animal animal) {
-        return new AnimalResponse(animal.getId(), animal.getNome(),animal.getRaca(), animal.getEspecie(), animal.getPorte(), animal.getCor(), animal.getSexo(), animal.getDataNascimento(), animal.getObservacao(), animal.getTutor().getId(), animal.getTutor().getNome());
+        UUID tutorId = animal.getTutor() != null ? animal.getTutor().getId() : null;
+        String tutorNome = animal.getTutor() != null ? animal.getTutor().getNome() : null;
+
+        return new AnimalResponse(
+                animal.getId(),
+                animal.getNome(),
+                animal.getRaca(),
+                animal.getEspecie(),
+                animal.getPorte(),
+                animal.getCor(),
+                animal.getSexo(),
+                animal.getDataNascimento(),
+                animal.getObservacao(),
+                tutorId,
+                tutorNome
+        );
     }
 
-    public Animal toEntity(AnimalRequest request, Tutor tutor){
+    public Animal toEntity(AnimalRequest request, Tutor tutor) {
         Animal animal = new Animal();
         animal.setNome(request.getNome());
         animal.setRaca(request.getRaca());

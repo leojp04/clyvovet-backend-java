@@ -6,6 +6,8 @@ import br.com.fiap.clyvovet.model.EventoClinico;
 import br.com.fiap.clyvovet.model.Pagamento;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class PagamentoMapper {
 
@@ -22,6 +24,10 @@ public class PagamentoMapper {
     }
 
     public PagamentoResponse toResponse(Pagamento pagamento) {
+        UUID eventoClinicoId = pagamento.getEventoClinico() != null
+                ? pagamento.getEventoClinico().getId()
+                : null;
+
         PagamentoResponse response = new PagamentoResponse();
         response.setId(pagamento.getId());
         response.setFormaPagamento(pagamento.getFormaPagamento());
@@ -30,7 +36,7 @@ public class PagamentoMapper {
         response.setDescricao(pagamento.getDescricao());
         response.setObservacao(pagamento.getObservacao());
         response.setStatusPagamento(pagamento.getStatusPagamento());
-        response.setEventoClinicoId(pagamento.getEventoClinico().getId());
+        response.setEventoClinicoId(eventoClinicoId);
         return response;
     }
 }

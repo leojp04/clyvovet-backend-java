@@ -7,12 +7,17 @@ import br.com.fiap.clyvovet.model.Veterinario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class VeterinarioMapper {
     private final EnderecoMapper enderecoMapper;
 
     public VeterinarioResponse veterinarioToResponse(Veterinario veterinario) {
+        UUID clinicaId = veterinario.getClinica() != null ? veterinario.getClinica().getId() : null;
+        String clinicaNome = veterinario.getClinica() != null ? veterinario.getClinica().getNome() : null;
+
         return new VeterinarioResponse(
                 veterinario.getId(),
                 veterinario.getNome(),
@@ -24,12 +29,12 @@ public class VeterinarioMapper {
                 veterinario.getDataNascimento(),
                 veterinario.getSexo(),
                 enderecoMapper.enderecoToResponse(veterinario.getEndereco()),
-                veterinario.getClinica().getId(),
-                veterinario.getClinica().getNome()
+                clinicaId,
+                clinicaNome
         );
     }
 
-    public Veterinario toEntity(VeterinarioRequest request){
+    public Veterinario toEntity(VeterinarioRequest request) {
         Veterinario veterinario = new Veterinario();
         veterinario.setNome(request.getNome());
         veterinario.setCpf(request.getCpf());

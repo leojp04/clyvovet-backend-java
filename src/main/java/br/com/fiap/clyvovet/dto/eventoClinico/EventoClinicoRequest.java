@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -17,7 +16,7 @@ public class EventoClinicoRequest {
     @NotNull
     private LocalDate data;
     @NotNull
-    private LocalTime hora;
+    private String hora;
     private String descricao;
     @NotNull
     private UUID veterinarioId;

@@ -9,10 +9,10 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Getter          // gera todos os getters
-@Setter          // gera todos os setters
-@NoArgsConstructor   // gera construtor vazio
-@AllArgsConstructor  // gera construtor com todos os campos
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Animal {
 
@@ -27,7 +27,7 @@ public class Animal {
     private String sexo;
     private LocalDate dataNascimento;
     private String observacao;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "tutor_id")
     private Tutor tutor;
 }

@@ -8,22 +8,31 @@ import br.com.fiap.clyvovet.model.EventoClinico;
 import br.com.fiap.clyvovet.model.Veterinario;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class EventoClinicoMapper {
 
     public EventoClinicoResponse toResponse(EventoClinico evento) {
+        UUID veterinarioId = evento.getVeterinario() != null ? evento.getVeterinario().getId() : null;
+        String veterinarioNome = evento.getVeterinario() != null ? evento.getVeterinario().getNome() : null;
+        UUID animalId = evento.getAnimal() != null ? evento.getAnimal().getId() : null;
+        String animalNome = evento.getAnimal() != null ? evento.getAnimal().getNome() : null;
+        UUID clinicaId = evento.getClinica() != null ? evento.getClinica().getId() : null;
+        String clinicaNome = evento.getClinica() != null ? evento.getClinica().getNome() : null;
+
         return new EventoClinicoResponse(
                 evento.getId(),
                 evento.getData(),
                 evento.getHora(),
                 evento.getDescricao(),
                 evento.getTipoEvento(),
-                evento.getVeterinario().getId(),
-                evento.getVeterinario().getNome(),
-                evento.getAnimal().getId(),
-                evento.getAnimal().getNome(),
-                evento.getClinica().getId(),
-                evento.getClinica().getNome()
+                veterinarioId,
+                veterinarioNome,
+                animalId,
+                animalNome,
+                clinicaId,
+                clinicaNome
         );
     }
 
