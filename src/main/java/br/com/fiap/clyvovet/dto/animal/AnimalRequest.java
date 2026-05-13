@@ -1,6 +1,6 @@
 package br.com.fiap.clyvovet.dto.animal;
 
-import br.com.fiap.clyvovet.model.Sexo;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -32,7 +32,8 @@ public class AnimalRequest {
     @Size(min = 3, max = 100)
     private String cor;
     @NotNull
-    private Sexo sexo;
+    @Size(min = 1, max = 10)
+    private String sexo;
     @NotNull
     private LocalDate dataNascimento;
     private String observacao;

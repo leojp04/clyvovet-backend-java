@@ -1,7 +1,8 @@
 package br.com.fiap.clyvovet.model;
 
 public enum StatusPagamento {
+    PENDENTE,
     PAGO,
-    AGUARDANDO,
-    CANCELADO
+    CANCELADO,
+    ESTORNADO
 }

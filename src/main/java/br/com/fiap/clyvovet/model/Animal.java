@@ -24,8 +24,7 @@ public class Animal {
     private String especie;
     private String porte;
     private String cor;
-    @Enumerated(EnumType.STRING)
-    private Sexo sexo;
+    private String sexo;
     private LocalDate dataNascimento;
     private String observacao;
     @ManyToOne
