@@ -5,22 +5,28 @@ import br.com.fiap.clyvovet.dto.tutor.TutorResponse;
 import br.com.fiap.clyvovet.service.TutorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/tutores")
 @RequiredArgsConstructor
-
 public class TutorController {
+
     private final TutorService tutorService;
 
+    // Paginação + ordenação + busca por nome e cidade
     @GetMapping
-    public ResponseEntity<List<TutorResponse>> listarTodos() {
-        return ResponseEntity.ok(tutorService.listarTodos());
+    public ResponseEntity<Page<TutorResponse>> listarTodos(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String cidade,
+            @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+        return ResponseEntity.ok(tutorService.listarTodos(nome, cidade, pageable));
     }
 
     @GetMapping("/{id}")
@@ -34,7 +40,9 @@ public class TutorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TutorResponse> atualizar(@PathVariable UUID id, @Valid @RequestBody TutorRequest tutorRequest) {
+    public ResponseEntity<TutorResponse> atualizar(
+            @PathVariable UUID id,
+            @Valid @RequestBody TutorRequest tutorRequest) {
         return ResponseEntity.ok(tutorService.atualizar(id, tutorRequest));
     }
 
@@ -43,5 +51,4 @@ public class TutorController {
         tutorService.deletar(id);
         return ResponseEntity.noContent().build();
     }
-
 }
