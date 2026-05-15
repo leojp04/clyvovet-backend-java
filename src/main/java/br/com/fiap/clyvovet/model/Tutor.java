@@ -1,18 +1,11 @@
 package br.com.fiap.clyvovet.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.*;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Getter          // gera todos os getters
-@Setter          // gera todos os setters
-@NoArgsConstructor   // gera construtor vazio
-@AllArgsConstructor  // gera construtor com todos os campos
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 @Entity
 public class Tutor {
 
@@ -21,14 +14,13 @@ public class Tutor {
     private UUID id;
     private String cpf;
     private String nome;
+    @Column(name = "data_nascimento")
     private LocalDate dataNascimento;
     @Enumerated(EnumType.STRING)
+    @Column(name = "genero")
     private Sexo sexo;
     private String email;
     private String telefone;
     @Embedded
     private Endereco endereco;
-
-
-
 }

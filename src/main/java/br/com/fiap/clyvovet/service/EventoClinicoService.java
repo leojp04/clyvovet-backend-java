@@ -3,18 +3,16 @@ package br.com.fiap.clyvovet.service;
 import br.com.fiap.clyvovet.dto.eventoClinico.EventoClinicoRequest;
 import br.com.fiap.clyvovet.dto.eventoClinico.EventoClinicoResponse;
 import br.com.fiap.clyvovet.mapper.EventoClinicoMapper;
-import br.com.fiap.clyvovet.model.Animal;
-import br.com.fiap.clyvovet.model.Clinica;
-import br.com.fiap.clyvovet.model.EventoClinico;
-import br.com.fiap.clyvovet.model.Veterinario;
-import br.com.fiap.clyvovet.repository.AnimalRepository;
-import br.com.fiap.clyvovet.repository.ClinicaRepository;
-import br.com.fiap.clyvovet.repository.EventoClinicoRepository;
-import br.com.fiap.clyvovet.repository.VeterinarioRepository;
+import br.com.fiap.clyvovet.model.*;
+import br.com.fiap.clyvovet.repository.*;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,41 +25,50 @@ public class EventoClinicoService {
     private final AnimalRepository animalRepository;
     private final ClinicaRepository clinicaRepository;
 
-    public List<EventoClinicoResponse> listarTodos() {
-        return eventoClinicoRepository.findAll().stream().map(eventoClinicoMapper::toResponse).toList();
+    @Cacheable(value = "eventos", key = "#tipoEvento + '-' + #animalNome + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    public Page<EventoClinicoResponse> listarTodos(TipoEvento tipoEvento, String animalNome, Pageable pageable) {
+        return eventoClinicoRepository.buscarPorFiltros(tipoEvento, animalNome, pageable)
+                .map(eventoClinicoMapper::toResponse);
     }
 
     public EventoClinicoResponse buscarPorId(UUID id) {
-        return eventoClinicoRepository.findById(id).map(eventoClinicoMapper::toResponse)
-                .orElseThrow(() -> new RuntimeException("Evento clínico não encontrado"));
+        return eventoClinicoRepository.findById(id)
+                .map(eventoClinicoMapper::toResponse)
+                .orElseThrow(() -> new EntityNotFoundException("Evento clínico não encontrado com ID: " + id));
     }
 
+    @CacheEvict(value = "eventos", allEntries = true)
     public EventoClinicoResponse salvar(EventoClinicoRequest request) {
         Veterinario veterinario = veterinarioRepository.findById(request.getVeterinarioId())
-                .orElseThrow(() -> new RuntimeException("Veterinário não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Veterinário não encontrado com ID: " + request.getVeterinarioId()));
         Animal animal = animalRepository.findById(request.getAnimalId())
-                .orElseThrow(() -> new RuntimeException("Animal não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Animal não encontrado com ID: " + request.getAnimalId()));
         Clinica clinica = clinicaRepository.findById(request.getClinicaId())
-                .orElseThrow(() -> new RuntimeException("Clínica não encontrada"));
-        EventoClinico evento = eventoClinicoMapper.toEntity(request, veterinario, animal, clinica);
+                .orElseThrow(() -> new EntityNotFoundException("Clínica não encontrada com ID: " + request.getClinicaId()));
+        return eventoClinicoMapper.toResponse(
+                eventoClinicoRepository.save(
+                        eventoClinicoMapper.toEntity(request, veterinario, animal, clinica)));
+    }
+
+    @CacheEvict(value = "eventos", allEntries = true)
+    public EventoClinicoResponse atualizar(UUID id, EventoClinicoRequest request) {
+        EventoClinico evento = eventoClinicoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Evento clínico não encontrado com ID: " + id));
+        Veterinario veterinario = veterinarioRepository.findById(request.getVeterinarioId())
+                .orElseThrow(() -> new EntityNotFoundException("Veterinário não encontrado com ID: " + request.getVeterinarioId()));
+        Animal animal = animalRepository.findById(request.getAnimalId())
+                .orElseThrow(() -> new EntityNotFoundException("Animal não encontrado com ID: " + request.getAnimalId()));
+        Clinica clinica = clinicaRepository.findById(request.getClinicaId())
+                .orElseThrow(() -> new EntityNotFoundException("Clínica não encontrada com ID: " + request.getClinicaId()));
+        eventoClinicoMapper.atualizar(evento, request, veterinario, animal, clinica);
         return eventoClinicoMapper.toResponse(eventoClinicoRepository.save(evento));
     }
 
-    public EventoClinicoResponse atualizar(UUID id, EventoClinicoRequest request) {
-        EventoClinico evento = eventoClinicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Evento clínico não encontrado"));
-        Veterinario veterinario = veterinarioRepository.findById(request.getVeterinarioId())
-                .orElseThrow(() -> new RuntimeException("Veterinário não encontrado"));
-        Animal animal = animalRepository.findById(request.getAnimalId())
-                .orElseThrow(() -> new RuntimeException("Animal não encontrado"));
-        Clinica clinica = clinicaRepository.findById(request.getClinicaId())
-                .orElseThrow(() -> new RuntimeException("Clínica não encontrada"));
-        eventoClinicoMapper.atualizar(evento, request, veterinario, animal, clinica);
-        eventoClinicoRepository.save(evento);
-        return eventoClinicoMapper.toResponse(evento);
-    }
-
+    @CacheEvict(value = "eventos", allEntries = true)
     public void deletar(UUID id) {
+        if (!eventoClinicoRepository.existsById(id)) {
+            throw new EntityNotFoundException("Evento clínico não encontrado com ID: " + id);
+        }
         eventoClinicoRepository.deleteById(id);
     }
 }

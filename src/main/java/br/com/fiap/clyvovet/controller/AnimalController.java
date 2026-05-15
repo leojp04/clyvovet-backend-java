@@ -5,38 +5,44 @@ import br.com.fiap.clyvovet.dto.animal.AnimalResponse;
 import br.com.fiap.clyvovet.service.AnimalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/animais")
 @RequiredArgsConstructor
-
 public class AnimalController {
+
     private final AnimalService animalService;
 
-
     @GetMapping
-    public ResponseEntity<List<AnimalResponse>> listarTodos() {
-        return ResponseEntity.ok(animalService.listarTodos());
+    public ResponseEntity<Page<AnimalResponse>> listarTodos(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String especie,
+            @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+        return ResponseEntity.ok(animalService.listarTodos(nome, especie, pageable));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AnimalResponse> buscarPorId(@PathVariable UUID id){
+    public ResponseEntity<AnimalResponse> buscarPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(animalService.buscarPorId(id));
     }
 
     @PostMapping
-    public ResponseEntity<AnimalResponse> criar(@Valid @RequestBody AnimalRequest animalRequest) {
-        return ResponseEntity.status(201).body(animalService.salvar(animalRequest));
+    public ResponseEntity<AnimalResponse> criar(@Valid @RequestBody AnimalRequest request) {
+        return ResponseEntity.status(201).body(animalService.salvar(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AnimalResponse> atualizar(@PathVariable UUID id, @Valid @RequestBody AnimalRequest animalRequest) {
-        return ResponseEntity.ok(animalService.atualizar(id, animalRequest));
+    public ResponseEntity<AnimalResponse> atualizar(
+            @PathVariable UUID id,
+            @Valid @RequestBody AnimalRequest request) {
+        return ResponseEntity.ok(animalService.atualizar(id, request));
     }
 
     @DeleteMapping("/{id}")
@@ -44,5 +50,4 @@ public class AnimalController {
         animalService.deletar(id);
         return ResponseEntity.noContent().build();
     }
-
 }

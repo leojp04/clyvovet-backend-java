@@ -5,10 +5,12 @@ import br.com.fiap.clyvovet.dto.veterinario.VeterinarioResponse;
 import br.com.fiap.clyvovet.service.VeterinarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -19,8 +21,11 @@ public class VeterinarioController {
     private final VeterinarioService veterinarioService;
 
     @GetMapping
-    public ResponseEntity<List<VeterinarioResponse>> listarTodos() {
-        return ResponseEntity.ok(veterinarioService.listarTodos());
+    public ResponseEntity<Page<VeterinarioResponse>> listarTodos(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String especialidade,
+            @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+        return ResponseEntity.ok(veterinarioService.listarTodos(nome, especialidade, pageable));
     }
 
     @GetMapping("/{id}")
@@ -29,13 +34,15 @@ public class VeterinarioController {
     }
 
     @PostMapping
-    public ResponseEntity<VeterinarioResponse> criar(@Valid @RequestBody VeterinarioRequest veterinarioRequest) {
-        return ResponseEntity.status(201).body(veterinarioService.salvar(veterinarioRequest));
+    public ResponseEntity<VeterinarioResponse> criar(@Valid @RequestBody VeterinarioRequest request) {
+        return ResponseEntity.status(201).body(veterinarioService.salvar(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<VeterinarioResponse> atualizar(@PathVariable UUID id, @Valid @RequestBody VeterinarioRequest veterinarioRequest) {
-        return ResponseEntity.ok(veterinarioService.atualizar(id, veterinarioRequest));
+    public ResponseEntity<VeterinarioResponse> atualizar(
+            @PathVariable UUID id,
+            @Valid @RequestBody VeterinarioRequest request) {
+        return ResponseEntity.ok(veterinarioService.atualizar(id, request));
     }
 
     @DeleteMapping("/{id}")

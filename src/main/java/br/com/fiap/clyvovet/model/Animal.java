@@ -1,18 +1,11 @@
 package br.com.fiap.clyvovet.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.*;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 @Entity
 public class Animal {
 
@@ -24,8 +17,11 @@ public class Animal {
     private String especie;
     private String porte;
     private String cor;
+    @Column(name = "genero")
     private String sexo;
+    @Column(name = "data_nascimento")
     private LocalDate dataNascimento;
+    @Column(name = "observacoes")
     private String observacao;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "tutor_id")

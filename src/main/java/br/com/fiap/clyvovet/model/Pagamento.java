@@ -1,21 +1,12 @@
 package br.com.fiap.clyvovet.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-
-@Getter          // gera todos os getters
-@Setter          // gera todos os setters
-@NoArgsConstructor   // gera construtor vazio
-@AllArgsConstructor  // gera construtor com todos os campos
-
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 @Entity
 public class Pagamento {
 
@@ -23,14 +14,18 @@ public class Pagamento {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     @Enumerated(EnumType.STRING)
+    @Column(name = "metodo_pagamento")
     private FormaPagamento formaPagamento;
     private BigDecimal valor;
+    @Column(name = "data_pagamento")
     private LocalDate dataPagamento;
     private String descricao;
+    @Column(name = "notas")
     private String observacao;
     @ManyToOne
-    @JoinColumn(name = "evento_clinico_id")
+    @JoinColumn(name = "evento_id")
     private EventoClinico eventoClinico;
     @Enumerated(EnumType.STRING)
+    @Column(name = "status_pagamento")
     private StatusPagamento statusPagamento;
 }

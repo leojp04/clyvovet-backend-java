@@ -5,10 +5,12 @@ import br.com.fiap.clyvovet.dto.clinica.ClinicaResponse;
 import br.com.fiap.clyvovet.service.ClinicaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -19,23 +21,28 @@ public class ClinicaController {
     private final ClinicaService clinicaService;
 
     @GetMapping
-    public ResponseEntity<List<ClinicaResponse>> listarTodos() {
-        return ResponseEntity.ok(clinicaService.listarTodos());
+    public ResponseEntity<Page<ClinicaResponse>> listarTodos(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String cidade,
+            @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+        return ResponseEntity.ok(clinicaService.listarTodos(nome, cidade, pageable));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ClinicaResponse> buscarPorId(@PathVariable UUID id){
+    public ResponseEntity<ClinicaResponse> buscarPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(clinicaService.buscarPorId(id));
     }
 
     @PostMapping
-    public ResponseEntity<ClinicaResponse> criar(@Valid @RequestBody ClinicaRequest clinicaRequest) {
-        return ResponseEntity.status(201).body(clinicaService.salvar(clinicaRequest));
+    public ResponseEntity<ClinicaResponse> criar(@Valid @RequestBody ClinicaRequest request) {
+        return ResponseEntity.status(201).body(clinicaService.salvar(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClinicaResponse> atualizar(@PathVariable UUID id, @Valid @RequestBody ClinicaRequest clinicaRequest) {
-        return ResponseEntity.ok(clinicaService.atualizar(id, clinicaRequest));
+    public ResponseEntity<ClinicaResponse> atualizar(
+            @PathVariable UUID id,
+            @Valid @RequestBody ClinicaRequest request) {
+        return ResponseEntity.ok(clinicaService.atualizar(id, request));
     }
 
     @DeleteMapping("/{id}")

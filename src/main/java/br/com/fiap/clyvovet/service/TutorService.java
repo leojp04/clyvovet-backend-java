@@ -24,7 +24,7 @@ public class TutorService {
     private final TutorMapper tutorMapper;
     private final EnderecoMapper enderecoMapper;
 
-    @Cacheable("tutores")
+    @Cacheable(value = "tutores", key = "#nome + '-' + #cidade + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<TutorResponse> listarTodos(String nome, String cidade, Pageable pageable) {
         return tutorRepository.buscarPorFiltros(nome, cidade, pageable)
                 .map(tutorMapper::tutorToResponse);
