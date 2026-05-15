@@ -23,6 +23,7 @@ public class Veterinario {
     private String nome;
     private LocalDate dataNascimento;
     @Enumerated(EnumType.STRING)
+    @Column(name = "genero")
     private Sexo sexo;
     private String email;
     private String telefone;
