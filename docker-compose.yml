@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  clyvovet-api:
+    build: .
+    container_name: clyvovet-api
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=h2
+    volumes:
+      - h2-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  h2-data:
+    name: clyvovet-h2-data
