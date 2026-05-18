@@ -17,8 +17,9 @@ public class Animal {
     private String especie;
     private String porte;
     private String cor;
+    @Enumerated(EnumType.STRING)
     @Column(name = "genero")
-    private String sexo;
+    private SexoAnimal sexo;
     @Column(name = "data_nascimento")
     private LocalDate dataNascimento;
     @Column(name = "observacoes")

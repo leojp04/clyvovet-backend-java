@@ -4,6 +4,8 @@ import br.com.fiap.clyvovet.dto.eventoClinico.EventoClinicoRequest;
 import br.com.fiap.clyvovet.dto.eventoClinico.EventoClinicoResponse;
 import br.com.fiap.clyvovet.model.TipoEvento;
 import br.com.fiap.clyvovet.service.EventoClinicoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,11 +19,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/eventos-clinicos")
 @RequiredArgsConstructor
+@Tag(name = "Eventos Clínicos", description = "Gerenciamento de eventos clínicos")
 public class EventoClinicoController {
 
     private final EventoClinicoService eventoClinicoService;
 
     @GetMapping
+    @Operation(summary = "Listar eventos com paginação e filtros por tipo e nome do animal")
     public ResponseEntity<Page<EventoClinicoResponse>> listarTodos(
             @RequestParam(required = false) TipoEvento tipoEvento,
             @RequestParam(required = false) String animalNome,
@@ -30,16 +34,19 @@ public class EventoClinicoController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Buscar evento clínico por ID")
     public ResponseEntity<EventoClinicoResponse> buscarPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(eventoClinicoService.buscarPorId(id));
     }
 
     @PostMapping
+    @Operation(summary = "Registrar novo evento clínico")
     public ResponseEntity<EventoClinicoResponse> criar(@Valid @RequestBody EventoClinicoRequest request) {
         return ResponseEntity.status(201).body(eventoClinicoService.salvar(request));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualizar evento clínico existente")
     public ResponseEntity<EventoClinicoResponse> atualizar(
             @PathVariable UUID id,
             @Valid @RequestBody EventoClinicoRequest request) {
@@ -47,6 +54,7 @@ public class EventoClinicoController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Remover evento clínico")
     public ResponseEntity<Void> deletar(@PathVariable UUID id) {
         eventoClinicoService.deletar(id);
         return ResponseEntity.noContent().build();

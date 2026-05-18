@@ -2,6 +2,7 @@ package br.com.fiap.clyvovet.dto.tutor;
 
 import br.com.fiap.clyvovet.dto.endereco.EnderecoRequest;
 import br.com.fiap.clyvovet.model.Sexo;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,6 +31,7 @@ public class TutorRequest {
     private Sexo sexo;
     @NotNull
     private LocalDate dataNascimento;
+    @Valid
     @NotNull
     private EnderecoRequest endereco;
 }

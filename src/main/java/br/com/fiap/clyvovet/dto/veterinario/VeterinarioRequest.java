@@ -2,6 +2,7 @@ package br.com.fiap.clyvovet.dto.veterinario;
 
 import br.com.fiap.clyvovet.dto.endereco.EnderecoRequest;
 import br.com.fiap.clyvovet.model.Sexo;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,6 +36,7 @@ public class VeterinarioRequest {
     @NotBlank
     @Size(min = 10, max = 11)
     private String telefone;
+    @Valid
     @NotNull
     private EnderecoRequest endereco;
     @NotBlank

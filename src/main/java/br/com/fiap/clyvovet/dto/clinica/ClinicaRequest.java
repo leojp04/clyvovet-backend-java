@@ -1,6 +1,7 @@
 package br.com.fiap.clyvovet.dto.clinica;
 
 import br.com.fiap.clyvovet.dto.endereco.EnderecoRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +28,7 @@ public class ClinicaRequest {
     @Email
     @Size(min = 10, max = 100)
     private String email;
+    @Valid
     @NotNull
     private EnderecoRequest endereco;
 }

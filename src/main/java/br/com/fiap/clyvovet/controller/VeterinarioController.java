@@ -3,6 +3,8 @@ package br.com.fiap.clyvovet.controller;
 import br.com.fiap.clyvovet.dto.veterinario.VeterinarioRequest;
 import br.com.fiap.clyvovet.dto.veterinario.VeterinarioResponse;
 import br.com.fiap.clyvovet.service.VeterinarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,11 +18,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/veterinarios")
 @RequiredArgsConstructor
+@Tag(name = "Veterinários", description = "Gerenciamento de veterinários")
 public class VeterinarioController {
 
     private final VeterinarioService veterinarioService;
 
     @GetMapping
+    @Operation(summary = "Listar veterinários com paginação e filtros por nome e especialidade")
     public ResponseEntity<Page<VeterinarioResponse>> listarTodos(
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) String especialidade,
@@ -29,16 +33,19 @@ public class VeterinarioController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Buscar veterinário por ID")
     public ResponseEntity<VeterinarioResponse> buscarPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(veterinarioService.buscarPorId(id));
     }
 
     @PostMapping
+    @Operation(summary = "Cadastrar novo veterinário")
     public ResponseEntity<VeterinarioResponse> criar(@Valid @RequestBody VeterinarioRequest request) {
         return ResponseEntity.status(201).body(veterinarioService.salvar(request));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualizar veterinário existente")
     public ResponseEntity<VeterinarioResponse> atualizar(
             @PathVariable UUID id,
             @Valid @RequestBody VeterinarioRequest request) {
@@ -46,6 +53,7 @@ public class VeterinarioController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Remover veterinário")
     public ResponseEntity<Void> deletar(@PathVariable UUID id) {
         veterinarioService.deletar(id);
         return ResponseEntity.noContent().build();

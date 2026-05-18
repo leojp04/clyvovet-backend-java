@@ -2,6 +2,8 @@ package br.com.fiap.clyvovet.controller;
 
 import br.com.fiap.clyvovet.dto.pagamento.PagamentoRequest;
 import br.com.fiap.clyvovet.dto.pagamento.PagamentoResponse;
+import br.com.fiap.clyvovet.model.FormaPagamento;
+import br.com.fiap.clyvovet.model.StatusPagamento;
 import br.com.fiap.clyvovet.service.PagamentoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,10 +33,12 @@ public class PagamentoController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar pagamentos com paginação")
+    @Operation(summary = "Listar pagamentos com paginação e filtros por status e forma de pagamento")
     public ResponseEntity<Page<PagamentoResponse>> listarTodos(
+            @RequestParam(required = false) StatusPagamento statusPagamento,
+            @RequestParam(required = false) FormaPagamento formaPagamento,
             @PageableDefault(size = 10, sort = "dataPagamento") Pageable pageable) {
-        return ResponseEntity.ok(pagamentoService.listarTodos(pageable));
+        return ResponseEntity.ok(pagamentoService.listarTodos(statusPagamento, formaPagamento, pageable));
     }
 
     @GetMapping("/{id}")

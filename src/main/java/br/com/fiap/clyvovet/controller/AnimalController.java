@@ -3,6 +3,8 @@ package br.com.fiap.clyvovet.controller;
 import br.com.fiap.clyvovet.dto.animal.AnimalRequest;
 import br.com.fiap.clyvovet.dto.animal.AnimalResponse;
 import br.com.fiap.clyvovet.service.AnimalService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,11 +18,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/animais")
 @RequiredArgsConstructor
+@Tag(name = "Animais", description = "Gerenciamento de animais")
 public class AnimalController {
 
     private final AnimalService animalService;
 
     @GetMapping
+    @Operation(summary = "Listar animais com paginação e filtros por nome e espécie")
     public ResponseEntity<Page<AnimalResponse>> listarTodos(
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) String especie,
@@ -29,16 +33,19 @@ public class AnimalController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Buscar animal por ID")
     public ResponseEntity<AnimalResponse> buscarPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(animalService.buscarPorId(id));
     }
 
     @PostMapping
+    @Operation(summary = "Cadastrar novo animal")
     public ResponseEntity<AnimalResponse> criar(@Valid @RequestBody AnimalRequest request) {
         return ResponseEntity.status(201).body(animalService.salvar(request));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Atualizar animal existente")
     public ResponseEntity<AnimalResponse> atualizar(
             @PathVariable UUID id,
             @Valid @RequestBody AnimalRequest request) {
@@ -46,6 +53,7 @@ public class AnimalController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Remover animal")
     public ResponseEntity<Void> deletar(@PathVariable UUID id) {
         animalService.deletar(id);
         return ResponseEntity.noContent().build();

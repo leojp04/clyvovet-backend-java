@@ -4,7 +4,9 @@ import br.com.fiap.clyvovet.dto.pagamento.PagamentoRequest;
 import br.com.fiap.clyvovet.dto.pagamento.PagamentoResponse;
 import br.com.fiap.clyvovet.mapper.PagamentoMapper;
 import br.com.fiap.clyvovet.model.EventoClinico;
+import br.com.fiap.clyvovet.model.FormaPagamento;
 import br.com.fiap.clyvovet.model.Pagamento;
+import br.com.fiap.clyvovet.model.StatusPagamento;
 import br.com.fiap.clyvovet.repository.EventoClinicoRepository;
 import br.com.fiap.clyvovet.repository.PagamentoRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -38,9 +40,10 @@ public class PagamentoService {
         return pagamentoMapper.toResponse(salvo);
     }
 
-    @Cacheable("pagamentos")
-    public Page<PagamentoResponse> listarTodos(Pageable pageable) {
-        return pagamentoRepository.findAll(pageable)
+
+    @Cacheable(value = "pagamentos", key = "#statusPagamento + '-' + #formaPagamento + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+    public Page<PagamentoResponse> listarTodos(StatusPagamento statusPagamento, FormaPagamento formaPagamento, Pageable pageable) {
+        return pagamentoRepository.buscarPorFiltros(statusPagamento, formaPagamento, pageable)
                 .map(pagamentoMapper::toResponse);
     }
 
