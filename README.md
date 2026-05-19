@@ -1,13 +1,3 @@
-# Getting Started
-
-### Reference Documentation
-
-For further reference, please consider the following sections:
-
-* [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
-* [Spring Boot Maven Plugin Reference Guide](https://docs.spring.io/spring-boot/3.5.14/maven-plugin)
-* [Create an OCI image](https://docs.spring.io/spring-boot/3.5.14/maven-plugin/build-image.html)
-* [Spring Data JPA](https://docs.spring.io/spring-boot/3.5.14/reference/data/sql.html#data.sql.jpa-and-spring-data)
 # CLYVO VET — Backend Java
 
 API REST desenvolvida em Spring Boot para o sistema de saúde contínua de pets **CLYVO VET**, como parte do Challenge FIAP 2026 — 1º Semestre.
@@ -90,9 +80,16 @@ Antes de iniciar a aplicação, execute o script SQL no SQL Developer:
 src/main/resources/db/db-oracle.sql
 ```
 
-Este script cria as 6 tabelas e insere os dados de seed. Execute com **Run Script (F5)** conectado ao Oracle da FIAP com suas credenciais.
+Este script cria as tabelas, índices, views, procedures e dados de seed. Execute com **Run Script (F5)** conectado ao Oracle da FIAP com suas credenciais.
 
-Depois, configure o `application.properties` com suas credenciais Oracle:
+Ative o perfil Oracle:
+
+```properties
+# application.properties
+spring.profiles.active=oracle
+```
+
+Configure suas credenciais em `application-oracle.properties`:
 
 ```properties
 spring.datasource.url=jdbc:oracle:thin:@oracle.fiap.com.br:1521:ORCL
@@ -102,15 +99,11 @@ spring.datasource.password=SUA_SENHA
 
 #### Opção B — H2 (desenvolvimento local, sem Oracle)
 
-Altere o `application.properties` para usar H2:
+Ative o perfil H2:
 
 ```properties
-spring.datasource.url=jdbc:h2:mem:clyvovet
-spring.datasource.driver-class-name=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-spring.h2.console.enabled=true
+# application.properties
+spring.profiles.active=h2
 ```
 
 ### 3. Executar
@@ -187,23 +180,29 @@ Valores válidos para `tipoEvento`: `CONSULTA` `RETORNO` `VACINA` `EXAME` `CIRUR
 
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/pagamentos` | Lista todos (paginado, ordenado por data) |
+| GET | `/pagamentos` | Lista todos (paginado). Filtros: `?statusPagamento=` `?formaPagamento=` |
 | GET | `/pagamentos/{id}` | Busca por ID |
 | POST | `/pagamentos` | Registra novo pagamento |
 | PUT | `/pagamentos/{id}` | Atualiza pagamento |
 | DELETE | `/pagamentos/{id}` | Remove pagamento |
 
+Valores válidos para `statusPagamento`: `PENDENTE` `PAGO` `CANCELADO` `REEMBOLSADO`
+
+Valores válidos para `formaPagamento`: `PIX` `CARTAO` `DINHEIRO` `BOLETO`
+
 ---
 
 ## Exemplos de Uso
 
-### Paginação e ordenação
+### Paginação, ordenação e filtros
 
 ```
 GET /animais?page=0&size=5&sort=nome,asc
 GET /tutores?nome=Lucas&page=0&size=10
 GET /veterinarios?especialidade=Cardiologia
 GET /eventos-clinicos?tipoEvento=VACINA
+GET /pagamentos?statusPagamento=PENDENTE
+GET /pagamentos?formaPagamento=PIX
 ```
 
 ### Exemplo de POST — Criar Tutor
@@ -212,9 +211,9 @@ GET /eventos-clinicos?tipoEvento=VACINA
 POST /tutores
 {
   "nome": "João Silva",
-  "cpf": "12345678901",
-  "email": "joao@email.com",
-  "telefone": "(11) 99999-9999",
+  "cpf": "12345678989",
+  "email": "silva@email.com",
+  "telefone": "11999999990",
   "sexo": "MASCULINO",
   "dataNascimento": "1990-01-15",
   "endereco": {
@@ -233,15 +232,46 @@ POST /tutores
 ```json
 POST /animais
 {
-  "nome": "Rex",
-  "especie": "CAO",
-  "raca": "Pastor Alemão",
+  "nome": "Thor",
+  "raca": "Golden Retriever",
+  "especie": "CACHORRO",
   "porte": "GRANDE",
-  "cor": "Preto e marrom",
+  "cor": "Dourado",
   "sexo": "MACHO",
-  "dataNascimento": "2020-01-18",
-  "observacao": "Cão de guarda",
+  "dataNascimento": "2021-03-10",
+  "observacao": "Animal saudável",
   "tutorId": "uuid-do-tutor"
+}
+```
+
+Valores válidos para `sexo` (animal): `MACHO` `FEMEA` `DESCONHECIDO`
+
+### Exemplo de POST — Criar Evento Clínico
+
+```json
+POST /eventos-clinicos
+{
+  "data": "2025-05-20",
+  "hora": "10:00",
+  "descricao": "Consulta de rotina",
+  "tipoEvento": "CONSULTA",
+  "veterinarioId": "uuid-do-veterinario",
+  "animalId": "uuid-do-animal",
+  "clinicaId": "uuid-da-clinica"
+}
+```
+
+### Exemplo de POST — Criar Pagamento
+
+```json
+POST /pagamentos
+{
+  "formaPagamento": "PIX",
+  "valor": 150.00,
+  "dataPagamento": "2025-05-20",
+  "descricao": "Pagamento consulta de rotina",
+  "statusPagamento": "PAGO",
+  "eventoClinicoId": "uuid-do-evento"
 }
 ```
 
@@ -251,7 +281,7 @@ POST /animais
 
 | Requisito | Status |
 |---|---|
-| Bean Validation nos Requests | ✅ |
+| Bean Validation nos Requests | ✅ todas as 6 entidades |
 | Paginação de resultados | ✅ todas as 6 entidades |
 | Ordenação de resultados | ✅ todas as 6 entidades |
 | Busca com parâmetros | ✅ todas as 6 entidades |
@@ -265,29 +295,57 @@ POST /animais
 ## Estrutura do Projeto
 
 ```
-src/main/java/br/com/fiap/clyvovet/
-├── controller/       # Controllers REST (6 entidades)
-├── service/          # Regras de negócio + cache
-├── repository/       # JPA Repositories com queries JPQL
-├── model/            # Entidades JPA
-├── dto/              # DTOs de Request e Response
-├── mapper/           # Conversão Entity ↔ DTO
-├── exception/        # GlobalExceptionHandler
-└── ClyvovetApplication.java
-
-src/main/resources/
-├── application.properties
-└── db/
-    └── db-oracle.sql  # Script de criação de tabelas + seed para Oracle FIAP
+clyvovet-backend-java/
+├── documentos/
+│   ├── Cronograma_CLYVOVET.pdf         # Cronograma de desenvolvimento
+│   ├── DiagramaClasses_CLYVOVET.pdf    # Diagrama de classes UML das entidades
+│   └── clyvovet_insomnia.json          # Coleção Insomnia para testes
+├── src/
+│   └── main/
+│       ├── java/br/com/fiap/clyvovet/
+│       │   ├── controller/             # Controllers REST (6 entidades)
+│       │   ├── service/                # Regras de negócio + cache
+│       │   ├── repository/             # JPA Repositories com queries JPQL
+│       │   ├── model/                  # Entidades JPA + Enums
+│       │   ├── dto/                    # DTOs de Request e Response
+│       │   ├── mapper/                 # Conversão Entity ↔ DTO
+│       │   ├── exception/              # GlobalExceptionHandler
+│       │   └── ClyvovetApplication.java
+│       └── resources/
+│           ├── db/
+│           │   └── db-oracle.sql       # DDL + seed para Oracle FIAP
+│           ├── application.properties
+│           ├── application-oracle.properties
+│           └── application-h2.properties
+├── Dockerfile
+├── docker-compose.yml
+└── deploy.sh                           # Script Azure CLI para deploy em VM Linux
 ```
 
 ---
 
 ## Testando os Endpoints
 
-A coleção de requisições para testes está disponível na pasta `documentos/` do repositório (exportação do Insomnia/Postman).
+A coleção completa de requisições está disponível na pasta `documentos/` do repositório (exportação do Insomnia).
 
 Você também pode testar diretamente pelo Swagger em:
+
 ```
 http://localhost:8080/swagger-ui.html
 ```
+
+---
+
+## Deploy em Nuvem (DevOps)
+
+O projeto inclui suporte completo para containerização e deploy na Azure:
+
+```bash
+# Build e execução local com Docker
+docker-compose up --build
+
+# Deploy em VM Linux na Azure (Azure CLI necessário)
+bash deploy.sh
+```
+
+O `deploy.sh` provisiona automaticamente uma VM Linux na Azure, instala Docker e Git, e sobe a aplicação via `docker-compose`.
